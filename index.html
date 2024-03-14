@@ -7,6 +7,7 @@
       <link rel="icon" type="image/png" href="https://bookinglinks.s3.eu-north-1.amazonaws.com/icona.png">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css">
       <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
@@ -16,7 +17,11 @@
       <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksFR.js"></script>
       <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksIT.js"></script>
       <style>
-         body { font-family: Arial, sans-serif; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
          /* Stili per la sezione Link Utili */
          #app3 {
          background-color: #f0f8ff; /* Colore di sfondo leggero per la sezione */
@@ -177,33 +182,118 @@
          padding: 8px 16px; /* Riduce il padding per adattarsi meglio agli schermi più piccoli */
          }
          }
+/* Miglioramenti alla visibilità dei bottoni (esempio) */
+#copyButton, #openButton {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#copyButton:hover, #openButton:hover {
+    background-color: #0056b3;
+}
+
+/* Barra di menu */
+nav select {
+    border: 1px solid #ccc;
+    color: #333;
+    background-color: white;
+}
+
+/* Aggiornamenti per migliorare la responsive design */
+@media (max-width: 768px) {
+    #bookingSearchInput {
+        width: 100%;
+    }
+
+    #controlsContainer, #bookingSearchContainer select, input, button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #007bff;
+  padding: 10px; /* Questo padding è applicato a tutto il contenitore nav */
+  color: white;
+}
+
+.webapp-title {
+  font-family: 'Arial', sans-serif;
+  font-size: 24px;
+  color: #FFFFFF;
+  text-shadow: 2px 2px 4px #000000;
+  font-weight: bold;
+  letter-spacing: 1px;
+  padding-left: 5px; /* Aumenta lo spazio dal margine sinistro */
+}
+
+.flags {
+  display: flex;
+  gap: 20px; /* Distanza tra le icone delle bandiere */
+  padding-right: 20px; /* Aumenta lo spazio dal margine destro */
+}
+
+.flag-icon {
+  cursor: pointer;
+  width: 40px; /* Aumenta la larghezza */
+  height: 30px; /* Mantiene il rapporto d'aspetto */
+  min-width: 30px; /* Imposta una larghezza minima */
+  max-width: 50px; /* Imposta una larghezza massima */
+}
+
+
+
+
       </style>
    </head>
    <body>
-      <div id="app3" class="content">
+    <!-- Barra di menu per il cambio lingua -->
+    <nav style="background-color: #007bff; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white;">
+      <div class="webapp-logo-and-title" style="display: flex; align-items: center;">
+        <img src="https://bookinglinks.s3.eu-north-1.amazonaws.com/icona.png" alt="Logo" style="height: 50px; margin-left: 10px;"> <!-- Aggiungi il logo qui -->
+        <div class="webapp-title">WebApp</div>
+      </div>
+      <div class="flags">
+        <span class="flag-icon flag-icon-it" id="flag-it" style="cursor: pointer;"></span>
+        <span class="flag-icon flag-icon-es" id="flag-es" style="cursor: pointer;"></span>
+        <span class="flag-icon flag-icon-gb" id="flag-en" style="cursor: pointer;"></span> <!-- Nota: "gb" per la bandiera del Regno Unito -->
+        <span class="flag-icon flag-icon-fr" id="flag-fr" style="cursor: pointer;"></span>
+      </div>
+    </nav>
+  <div id="app3" class="content">
       <h1>Link Utili</h1>
       <div id="controlsContainer">
-         <select id="linkSelector"></select>
-         <select id="languageSelector">
-            <option value="it">IT</option>
-            <option value="es">ES</option>
-            <option value="en">EN</option>
-            <option value="fr">FR</option>
-         </select>
-         <button id="copyButton">Copia link</button>
-         <button id="openButton">Apri</button>
+          <select id="linkSelector"></select>
+          <select id="languageSelector">
+              <option value="it">IT</option>
+              <option value="es">ES</option>
+              <option value="en">EN</option>
+              <option value="fr">FR</option>
+          </select>
+          <button id="copyButton">Copia link</button>
+          <button id="openButton">Apri</button>
       </div>
       <div id="bookingSearchContainer">
-         <h2>Cerca il tuo link di Booking</h2>
-         <select id="languageSelect">
-            <option value="it">IT</option>
-            <option value="es">ES</option>
-            <option value="en">EN</option>
-            <option value="fr">FR</option>
-         </select>
-         <input type="text" id="bookingSearchInput" placeholder="Cerca link di Booking...">
-         <div id="bookingSearchResults"></div>
+          <h2>Cerca il tuo link di Booking</h2>
+          <select id="languageSelect">
+              <option value="it">IT</option>
+              <option value="es">ES</option>
+              <option value="en">EN</option>
+              <option value="fr">FR</option>
+          </select>
+          <input type="text" id="bookingSearchInput" placeholder="Cerca link di Booking...">
+          <div id="bookingSearchResults"></div>
       </div>
+      <!-- Inclusione dello script direttamente nel documento per semplicità -->
+  </div>
       <script>
          document.addEventListener("DOMContentLoaded", function() {
              const links = [
@@ -394,7 +484,62 @@
          // Iniziale carica i link per la lingua predefinita (inglese)
          updateLinks('en');
          });
-         
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Aggiunge listener di click per ogni bandiera
+    document.getElementById('flag-it').addEventListener('click', function() { cambiaLingua('it'); });
+    document.getElementById('flag-es').addEventListener('click', function() { cambiaLingua('es'); });
+    document.getElementById('flag-en').addEventListener('click', function() { cambiaLingua('en'); });
+    document.getElementById('flag-fr').addEventListener('click', function() { cambiaLingua('fr'); });
+});
+
+function cambiaLingua(codiceLingua) {
+    // Definizioni dei testi tradotti, inclusi placeholder e bottoni
+    const testiTradotti = {
+        'it': {
+            'titolo': 'Link Utili',
+            'descrizione': 'Cerca il tuo link di Booking',
+            'placeholder': 'Cerca link di Booking...',
+            'copia': 'Copia link',
+            'apri': 'Apri'
+        },
+        'es': {
+            'titolo': 'Enlaces Útiles',
+            'descrizione': 'Busca tu enlace de Booking',
+            'placeholder': 'Buscar enlace de Booking...',
+            'copia': 'Copiar enlace',
+            'apri': 'Abrir'
+        },
+        'en': {
+            'titolo': 'Useful Links',
+            'descrizione': 'Search your Booking link',
+            'placeholder': 'Search Booking link...',
+            'copia': 'Copy link',
+            'apri': 'Open'
+        },
+        'fr': {
+            'titolo': 'Liens Utiles',
+            'descrizione': 'Cherchez votre lien Booking',
+            'placeholder': 'Chercher lien de Booking...',
+            'copia': 'Copier le lien',
+            'apri': 'Ouvrir'
+        }
+    };
+
+    // Aggiorna i titoli e le descrizioni
+    document.getElementById('app3').querySelector('h1').textContent = testiTradotti[codiceLingua]['titolo'];
+    document.getElementById('bookingSearchContainer').querySelector('h2').textContent = testiTradotti[codiceLingua]['descrizione'];
+
+    // Aggiorna il placeholder dell'input di ricerca
+    document.getElementById('bookingSearchInput').setAttribute('placeholder', testiTradotti[codiceLingua]['placeholder']);
+
+    // Aggiorna il testo dei bottoni
+    document.getElementById('copyButton').textContent = testiTradotti[codiceLingua]['copia'];
+    document.getElementById('openButton').textContent = testiTradotti[codiceLingua]['apri'];
+}
+
+
+
       </script>
    </body>
 </html>
