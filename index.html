@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="it">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>PixelPusher</title>
+      <link rel="icon" type="image/png" href="https://bookinglinks.s3.eu-north-1.amazonaws.com/icona.png">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.0.7/compressor.min.js"></script>
+      <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksEN.js"></script>
+      <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksES.js"></script>
+      <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksFR.js"></script>
+      <script src="https://bookinglinks.s3.eu-north-1.amazonaws.com/linksIT.js"></script>
+      <style>
+         body { font-family: Arial, sans-serif; }
+         /* Stili per la sezione Link Utili */
+         #app3 {
+         background-color: #f0f8ff; /* Colore di sfondo leggero per la sezione */
+         border-radius: 8px; /* Bordi arrotondati */
+         padding: 20px; /* Spaziatura interna */
+         margin-top: 20px; /* Margine superiore per distanziarla dalle altre sezioni */
+         }
+         #app3 h1 {
+         color: #333; /* Colore del testo per l'intestazione */
+         text-align: center; /* Centra l'intestazione */
+         margin-bottom: 20px; /* Spazio sotto l'intestazione */
+         }
+         #app3 ul {
+         list-style-type: none; /* Rimuove i punti della lista */
+         padding: 0; /* Rimuove il padding predefinito */
+         display: flex; /* Display flex per mettere gli elementi in linea */
+         flex-wrap: wrap; /* Permette agli elementi di andare a capo se non ci sta spazio */
+         gap: 20px; /* Distanza tra gli elementi */
+         }
+         #app3 ul li {
+         display: flex; /* Display flex per mettere link e pulsante in linea */
+         align-items: center; /* Centra verticalmente il contenuto del li */
+         }
+         #app3 ul li a {
+         margin-right: 10px; /* Spazio tra il link e il pulsante di copia */
+         }
+         #app3 li {
+         margin-bottom: 10px; /* Spazio tra i link */
+         }
+         #app3 a {
+         text-decoration: none; /* Rimuove il sottolineato dei link */
+         color: #007bff; /* Colore del link */
+         font-weight: bold; /* Rende il testo dei link in grassetto */
+         }
+         #app3 a:hover {
+         color: #0056b3; /* Cambia il colore del link al passaggio del mouse */
+         }
+         /* Stili responsive per dispositivi mobili */
+         @media (max-width: 768px) {
+         #app3 {
+         margin-top: 10px; /* Riduci il margine superiore su schermi più piccoli */
+         padding: 10px; /* Riduci la spaziatura interna */
+         }
+         }
+         #bookingSearchContainer {
+         margin: 20px;
+         text-align: center;
+         }
+         #bookingSearchInput {
+         width: 60%;
+         padding: 10px;
+         margin-bottom: 20px;
+         border: 1px solid #ccc;
+         border-radius: 5px;
+         }
+         #bookingSearchResults {
+         margin-top: 20px;
+         }
+         #globalMessage {
+         position: fixed;
+         top: -50px;
+         right: 10px;
+         background-color: green;
+         color: white;
+         padding: 10px;
+         border-radius: 4px;
+         z-index: 1000;
+         transition: top 0.5s ease;
+         }
+         #globalMessage.show {
+         top: 80px;
+         }
+         select {
+         padding: 8px 16px;
+         border: 1px solid #ccc; /* Colore del bordo */
+         border-radius: 20px; /* Bordi arrotondati */
+         background-color: white; /* Colore di sfondo */
+         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Ombra leggera per profondità */
+         outline: none; /* Rimuove l'outline di default al focus */
+         cursor: pointer; /* Cambia il cursore in una manina per indicare che l'elemento è cliccabile */
+         margin-right: 10px; /* Spazio tra i selettori */
+         }
+         select:hover {
+         background-color: #f0f0f0; /* Cambia lo sfondo al passaggio del mouse */
+         }
+         select:focus {
+         border-color: #007bff; /* Cambia il colore del bordo quando il selettore è focalizzato */
+         }
+         /* Puoi personalizzare ulteriormente i selettori per differenti dispositivi/screen */
+         @media (max-width: 768px) {
+         select {
+         padding: 10px 14px; /* Adatta il padding per schermi più piccoli */
+         width: 100%; /* Usa tutta la larghezza disponibile */
+         margin-bottom: 10px; /* Spazio tra i selettori quando sono uno sopra l'altro */
+         margin-right: 0; /* Rimuove il margine destro */
+         }
+         }
+         h2 {
+         font-size: 20px; /* Leggermente più piccolo dell'h1 per mantenere la gerarchia */
+         color: #555; /* Colore del testo un po' più morbido rispetto all'h1 */
+         text-align: center; /* Allineamento a sinistra per differenziarlo dall'h1 centrato */
+         margin: 40px; /* Margine superiore per separarlo dal contenuto sopra */
+         margin-bottom: 20px; /* Margine inferiore per avvicinarlo al contenitore di ricerca */
+         font-family: 'Arial', sans-serif; /* Consistenza con la famiglia di font dell'h1 */
+         text-transform: none; /* Nessuna trasformazione, per differenziarlo dall'h1 */
+         letter-spacing: normal; /* Spaziatura normale delle lettere */
+         padding-left: 20px; /* Padding sinistro per allinearlo con gli altri elementi interni al div */
+         }
+         #controlsContainer {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         flex-wrap: wrap; /* Permette agli elementi di andare a capo se non ci sta abbastanza spazio */
+         gap: 10px; /* Distanza tra gli elementi */
+         }
+         /* Stili aggiuntivi per i select e i button per renderli coerenti */
+         #linkSelector, #languageSelector, #copyButton, #openButton {
+         padding: 8px 12px;
+         margin: 5px; /* Margini leggeri per separare leggermente gli elementi */
+         border: 1px solid #ccc;
+         border-radius: 5px;
+         cursor: pointer;
+         }
+         .buttonContainer {
+         visibility: hidden;
+         display: flex;
+         gap: 20px; /* Distanza tra i bottoni */
+         }
+         .container:hover .buttonContainer {
+         visibility: visible;
+         }
+         /* Stili per i bottoni */
+         .buttonContainer button {
+         background-color: #4CAF50; /* Colore di sfondo verde */
+         color: white; /* Testo bianco */
+         padding: 10px 20px; /* Padding intorno al testo */
+         margin: 20px 0; /* Margine sopra e sotto il bottone */
+         border: none; /* Nessun bordo */
+         cursor: pointer; /* Cursor a forma di puntatore */
+         border-radius: 5px; /* Bordi arrotondati */
+         transition: background-color 0.3s ease; /* Transizione fluida del colore di sfondo */
+         }
+         .buttonContainer button:hover {
+         background-color: #45a049; /* Colore di sfondo più scuro al passaggio del mouse */
+         }
+         .buttonContainer button:disabled {
+         background-color: #cccccc; /* Colore di sfondo per i bottoni disabilitati */
+         cursor: not-allowed; /* Cursor che indica l'azione non permessa */
+         }
+         /* Media query per dispositivi con larghezza fino a 768px */
+         @media (max-width: 768px) {
+         .buttonContainer {
+         flex-direction: column; /* Imposta i bottoni in colonna */
+         gap: 5px; /* Riduce la distanza tra i bottoni */
+         }
+         .buttonContainer button {
+         margin: 5px 0; /* Riduce il margine sopra e sotto i bottoni */
+         padding: 8px 16px; /* Riduce il padding per adattarsi meglio agli schermi più piccoli */
+         }
+         }
+      </style>
+   </head>
+   <body>
+      <div id="app3" class="content">
+      <h1>Link Utili</h1>
+      <div id="controlsContainer">
+         <select id="linkSelector"></select>
+         <select id="languageSelector">
+            <option value="it">IT</option>
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+         </select>
+         <button id="copyButton">Copia link</button>
+         <button id="openButton">Apri</button>
+      </div>
+      <div id="bookingSearchContainer">
+         <h2>Cerca il tuo link di Booking</h2>
+         <select id="languageSelect">
+            <option value="it">IT</option>
+            <option value="es">ES</option>
+            <option value="en">EN</option>
+            <option value="fr">FR</option>
+         </select>
+         <input type="text" id="bookingSearchInput" placeholder="Cerca link di Booking...">
+         <div id="bookingSearchResults"></div>
+      </div>
+      <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             const links = [
+                 { name: "GetYourGuide", urls: { it: "https://www.getyourguide.it/?partner_id=Q5TFESQ", es: "https://www.getyourguide.es/?partner_id=Q5TFESQ", en: "https://www.getyourguide.com?partner_id=Q5TFESQ", fr: "https://www.getyourguide.fr?partner_id=Q5TFESQ" } },
+                 { name: "Civitatis", urls: { it: "https://www.civitatis.com/it/?aid=5488", es: "https://www.civitatis.com/es/?aid=5488", en: "https://www.civitatis.com/en/?aid=5488", fr: "https://www.civitatis.com/fr/?aid=5488" } },
+                 { name: "Coches Menorca", urls: { it: "https://cochesmenorca.es/it/?agentId=3", es: "https://cochesmenorca.es/?agentId=3", en: "https://cochesmenorca.es/en/?agentId=3" } },
+                 { name: "Menorca Rent", urls: { it: "https://www.menorcarent.com/it/?agentId=15", es: "https://www.menorcarent.com/es/?agentId=15", en: "https://www.menorcarent.com/?agentId=15", fr: "https://www.menorcarent.com/fr/?agentId=15" } },
+                 { name: "Autos Xoroi", urls: { it: "http://www.alquilercochesmenorca.com/it/?link=ISOLADIMINORCA", es: "http://www.alquilercochesmenorca.com/es/?link=ISOLADIMINORCA", en: "http://www.alquilercochesmenorca.com/?link=ISOLADIMINORCA", fr: "http://www.alquilercochesmenorca.com/fr/?link=ISOLADIMINORCA" } },
+                 { name: "HIPER", urls: { it: "https://hiperrentacar.com/it/?colaborador=LO-0495108", es: "https://hiperrentacar.com/es/?colaborador=LO-0495108", en: "https://hiperrentacar.com/?colaborador=LO-0495108", fr: "https://hiperrentacar.com/fr/?colaborador=LO-0495108" } },
+                 { name: "Rentalcars", urls: { it: "https://www.rentalcars.com/it/?affiliateCode=TUOCODICE", es: "https://www.rentalcars.com/es/?affiliateCode=TUOCODICE", en: "https://www.rentalcars.com/?affiliateCode=TUOCODICE", fr: "https://www.rentalcars.com/fr/?affiliateCode=TUOCODICE" } },
+                 { name: "eDreams", urls: { it: "https://clk.tradedoubler.com/click?p=17269&a=TUOCODICE&url=https%3A%2F%2Fwww.edreams.it%2F", es: "https://clk.tradedoubler.com/click?p=17269&a=TUOCODICE&url=https%3A%2F%2Fwww.edreams.es%2F", en: "https://clk.tradedoubler.com/click?p=17269&a=TUOCODICE&url=https%3A%2F%2Fwww.edreams.com%2F", fr: "https://clk.tradedoubler.com/click?p=17269&a=TUOCODICE&url=https%3A%2F%2Fwww.edreams.fr%2F" } },
+                 { name: "Vueling", urls: { it: "https://clk.tradedoubler.com/click?p=288053&a=TUOCODICE&url=https%3A%2F%2Fwww.vueling.com%2Fit", es: "https://clk.tradedoubler.com/click?p=288053&a=TUOCODICE&url=https%3A%2F%2Fwww.vueling.com%2Fes", en: "https://clk.tradedoubler.com/click?p=288053&a=TUOCODICE&url=https%3A%2F%2Fwww.vueling.com%2F", fr: "https://clk.tradedoubler.com/click?p=288053&a=TUOCODICE&url=https%3A%2F%2Fwww.vueling.com%2Ffr" } },
+                 { name: "Booking Minorca", urls: { it: "https://www.booking.com/searchresults.it.html?region=1409&aid=TUOCODICE&no_rooms=1&group_adults=2", es: "https://www.booking.com/searchresults.es.html?region=1409&aid=TUOCODICE&no_rooms=1&group_adults=2", en: "https://www.booking.com/searchresults.en.html?region=1409&aid=TUOCODICE&no_rooms=1&group_adults=2", fr: "https://www.booking.com/searchresults.fr.html?region=1409&aid=TUOCODICE&no_rooms=1&group_adults=2" } }
+             ];
+         
+             const linkSelector = document.getElementById('linkSelector');
+             const languageSelector = document.getElementById('languageSelector');
+             const copyButton = document.getElementById('copyButton');
+             const openButton = document.getElementById('openButton');
+         
+             // Popola il selettore di link
+             links.forEach((link, index) => {
+                 const option = document.createElement('option');
+                 option.value = index; // L'indice dell'elemento nell'array links
+                 option.textContent = link.name;
+                 linkSelector.appendChild(option);
+             });
+         
+             function getSelectedLink() {
+                 const selectedLinkIndex = linkSelector.value;
+                 const selectedLanguage = languageSelector.value;
+                 return links[selectedLinkIndex].urls[selectedLanguage];
+             }
+         
+             copyButton.onclick = function() {
+                 const url = getSelectedLink();
+                 navigator.clipboard.writeText(url).then(() => {
+                     mostraMessaggioGlobalmente('Link copiato negli appunti!');
+                 }).catch(err => {
+                     console.error('Errore nella copia del link: ', err);
+                 });
+             };
+         
+             openButton.onclick = function() {
+                 const url = getSelectedLink();
+                 window.open(url, '_blank');
+             };
+         });
+         
+         function mostraMessaggioGlobalmente(testo) {
+             const messageElement = document.getElementById('globalMessage') || document.createElement('div');
+             if (!messageElement.id) {
+                 messageElement.id = 'globalMessage';
+                 document.body.appendChild(messageElement);
+             }
+         
+             messageElement.textContent = testo;
+             messageElement.classList.add('show');
+         
+             setTimeout(() => { messageElement.classList.remove('show'); }, 3000); // Nascondi il messaggio dopo 3 secondi
+         }
+         
+         document.addEventListener('DOMContentLoaded', function() {
+         // Rileva se l'utente sta utilizzando un dispositivo touch
+         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+         
+         if (isTouchDevice) {
+         // Seleziona tutti i container
+         const containers = document.querySelectorAll('.container');
+         
+         containers.forEach(container => {
+            container.addEventListener('click', function() {
+                // Trova il buttonContainer nel container cliccato
+                const buttonContainer = this.querySelector('.buttonContainer');
+                // Controlla la visibilità e cambiala
+                const isHidden = getComputedStyle(buttonContainer).visibility === 'hidden';
+                // Prima di mostrare il buttonContainer corrente, nascondi tutti gli altri
+                document.querySelectorAll('.buttonContainer').forEach(bc => {
+                    if (bc !== buttonContainer) {
+                        bc.style.visibility = 'hidden';
+                    }
+                });
+                // Mostra o nasconde il buttonContainer corrente
+                buttonContainer.style.visibility = isHidden ? 'visible' : 'hidden';
+            });
+         });
+         }
+         });
+         
+         
+         document.addEventListener('DOMContentLoaded', function () {
+         // Rileva il cambiamento del selettore di lingua
+         document.getElementById('languageSelect').addEventListener('change', function () {
+         const selectedLanguage = this.value;
+         updateLinks(selectedLanguage);
+         });
+         
+         // Rileva la ricerca dell'utente
+         document.getElementById('bookingSearchInput').addEventListener('input', function() {
+         const selectedLanguage = document.getElementById('languageSelect').value;
+         updateLinks(selectedLanguage);
+         });
+         
+         // Funzione per aggiornare i link in base alla lingua selezionata e per gestire la ricerca
+         function updateLinks(language) {
+         const searchTerm = document.getElementById('bookingSearchInput').value.toLowerCase();
+         const resultsContainer = document.getElementById('bookingSearchResults');
+         resultsContainer.innerHTML = ''; // Pulisce i risultati precedenti
+         
+         if (searchTerm.length < 3) {
+         return; // Evita la ricerca per input troppo corti
+         }
+         
+         let links;
+         switch (language) {
+         case 'it':
+            links = linksIT;
+            break;
+         case 'en':
+            links = linksEN;
+            break;
+         case 'es':
+            links = linksES;
+            break;
+         case 'fr':
+            links = linksFR;
+            break;
+         default:
+            links = []; // In caso di lingua non supportata, non ci sono link disponibili
+            break;
+         }
+         
+         const filteredLinks = links.filter(link => link[0] && link[0].toLowerCase().includes(searchTerm));
+         
+         // Mostra i risultati della ricerca...
+         displayResults(filteredLinks);
+         }
+         
+         // Funzione per visualizzare i risultati della ricerca
+         function displayResults(filteredLinks) {
+         const resultsContainer = document.getElementById('bookingSearchResults');
+         
+         if (filteredLinks.length === 0) {
+         resultsContainer.innerHTML = '<p>Nessun risultato trovato.</p>';
+         return;
+         }
+         
+         filteredLinks.forEach(link => {
+         const container = document.createElement('div');
+         container.className = 'container';
+         container.style.display = 'flex';
+         container.style.alignItems = 'center';
+         container.style.marginBottom = '10px';
+         
+         const linkElement = document.createElement('a');
+         linkElement.href = link[3]; // L'URL è il quarto elemento nell'array
+         linkElement.target = "_blank";
+         linkElement.textContent = `${link[0]} - ${link[2]}`; // Il nome e la città
+         linkElement.style.marginRight = '10px';
+         
+         const buttonContainer = document.createElement('div');
+         buttonContainer.className = 'buttonContainer'; // Utilizzo della classe invece di inline style per 'display'
+         
+         const copyButton = document.createElement('button');
+         copyButton.textContent = 'Copia link';
+         copyButton.onclick = function() {
+            navigator.clipboard.writeText(link[3]).then(() => {
+                mostraMessaggioGlobalmente('Link copiato negli appunti!');
+            }).catch(err => {
+                console.error('Errore nella copia del link: ', err);
+            });
+         };
+         
+         const openButton = document.createElement('button');
+         openButton.textContent = 'Apri';
+         openButton.onclick = function() {
+            window.open(link[3], '_blank');
+         };
+         
+         buttonContainer.appendChild(copyButton);
+         buttonContainer.appendChild(openButton);
+         container.appendChild(linkElement);
+         container.appendChild(buttonContainer);
+         resultsContainer.appendChild(container);
+         });
+         }
+         
+         // Iniziale carica i link per la lingua predefinita (inglese)
+         updateLinks('en');
+         });
+         
+      </script>
+   </body>
+</html>
